@@ -1,10 +1,6 @@
 # Self-Hosting n8n on Google Cloud Run: Complete Guide
 
-So you want to run n8n without the monthly subscription fees, keep your data under your own control, and avoid the headache of server maintenance? Google Cloud Run offers exactly that sweet spot: fully managed, serverless containers with per-use pricing. This repo gives you a production-ready Pulumi program that stands up the official n8n container on Cloud Run, backed by Cloud SQL Postgres, wrapped with Google Secret Manager, and ready for secure automation at scale.
-
-> **Fast Track**
->
-> Prefer infrastructure-as-code that can be executed in a single command? This repository also contains the original Terraform implementation under `terraform/`. The Pulumi version in `src/` is the recommended path if you want strong typing, component reuse, and first-class integration with modern dev tooling.
+So you want to run n8n without the monthly subscription fees, keep your data under your own control, and avoid the headache of server maintenance? Google Cloud Run offers exactly that sweet spot: fully managed, serverless containers with per-use pricing. This repo gives you a production-ready, modular Pulumi program that stands up the official n8n container on Cloud Run, backed by Cloud SQL Postgres, wrapped with Google Secret Manager, and ready for secure automation at scale.
 
 ## Why Teams Self-Host n8n on Cloud Run
 
@@ -13,17 +9,42 @@ So you want to run n8n without the monthly subscription fees, keep your data und
 - **Native Google integrations** – Built-in OAuth consent, low-latency access to GCP services, and the ability to use Workload Identity with the deployed service account.
 - **Infrastructure as Code** – Pulumi keeps a full inventory of the deployed resources so you can version, review, and promote changes across environments.
 
+## Component-Driven Pulumi Structure
+
+- **ProjectServices** enables the core GCP APIs (Run, Secret Manager, Cloud SQL Admin, and Resource Manager) so every other resource has the prerequisites it needs.
+- **ServiceAccount** provisions the dedicated workload identity for n8n and grants it IAM roles for Cloud SQL and Secret Manager access.
+- **Database** creates the Cloud SQL Postgres instance, database, user, and randomly generated password.
+- **Secrets** stores sensitive values—database password and n8n encryption key—in Secret Manager with latest-version references for runtime.
+- **CloudRunService** deploys the n8n container to Cloud Run, mounts the Cloud SQL proxy, injects secrets, and optionally grants public invoker access.
+
 ## Architecture Overview
 
-```
-Pulumi ➜ Cloud Run (n8n container)
-				│
-				├─ Secret Manager (DB password, encryption key)
-				└─ Cloud SQL Postgres (persistent storage)
+```mermaid
+flowchart TD
+   Pulumi[Pulumi Program<br/>src/index.ts] --> Services[ProjectServices<br/>Enable APIs]
+   Pulumi --> SA[ServiceAccount<br/>Workload Identity]
+   Pulumi --> DB[Database Component<br/>Cloud SQL Postgres]
+   Pulumi --> Secrets[Secrets Component<br/>Secret Manager]
+   Pulumi --> Run[CloudRunService Component<br/>Cloud Run v2]
+
+   Services -->|Enables| Run
+   Services -->|Enables| Secrets
+   Services -->|Enables| DB
+   Services -->|Enables| SA
+
+   SA -->|IAM Roles| Run
+   SA -->|IAM Roles| DB
+
+   DB -->|Connection Name| Run
+   DB -->|Password| Secrets
+
+   Secrets -->|Secret Version| Run
+
+   Run -->|Optional Public Invoker| Public[(allUsers)]
 ```
 
-- **Cloud Run Service** (`google_cloud_run_v2_service`) hosts the official `docker.io/n8nio/n8n:latest` image with CPU boost, health probes, and Cloud SQL proxy volume mount.
-- **Cloud SQL (Postgres 13)** stores workflow state, credentials, and execution logs.
+- **Cloud Run Service** (`gcp.cloudrunv2.Service`) hosts the official `docker.io/n8nio/n8n:latest` image with CPU boost, health probes, and Cloud SQL proxy volume mount.
+- **Cloud SQL (Postgres 15)** stores workflow state, credentials, and execution logs.
 - **Secret Manager** secures the database password and n8n encryption key generated via `@pulumi/random`.
 - **Service Account** carries the minimum IAM roles (Cloud SQL Client, Secret Accessor) and is optionally granted the anonymous `roles/run.invoker` binding for public access.
 
@@ -36,10 +57,35 @@ Pulumi ➜ Cloud Run (n8n container)
 
 ## Repository Layout
 
-- `src/index.ts` – Pulumi program creating all GCP resources.
-- `Pulumi.yaml` – Project definition (Node.js runtime with TypeScript).
-- `Pulumi.<stack>.yaml` – Environment-specific configuration files.
-- `terraform/` – Original Terraform configuration (optional alternative).
+```
+.
+├─ README.md
+├─ LICENSE
+├─ package.json
+├─ package-lock.json            # Generated when using npm
+├─ pnpm-lock.yaml               # Generated when using pnpm
+├─ Pulumi.yaml
+├─ Pulumi.self-host-n8n-gcp.yaml
+├─ tsconfig.json
+└─ src/
+   ├─ config.ts                # Aggregates Pulumi stack config into DeploymentConfig
+   ├─ index.ts                 # Entry point orchestrating component creation
+   ├─ components/
+   │  ├─ CloudRunService.ts    # Cloud Run deployment + IAM binding
+   │  ├─ Database.ts           # Cloud SQL instance, database, user, password
+   │  ├─ ProjectServices.ts    # Enables required GCP APIs
+   │  ├─ Secrets.ts            # Secret Manager secrets for password and encryption key
+   │  ├─ ServiceAccount.ts     # Workload identity + role attachments
+   │  └─ index.ts              # Barrel file exporting component factories
+   ├─ types/
+   │  ├─ config.types.ts       # Deployment configuration interfaces
+   │  └─ components.types.ts   # Component return types
+   └─ utils/
+```
+
+Generated directories such as `node_modules/` are omitted for brevity.
+
+````
 
 ## Pulumi Deployment Steps
 
@@ -47,7 +93,7 @@ Pulumi ➜ Cloud Run (n8n container)
 
    ```bash
    pnpm install       # or npm install
-   ```
+````
 
 2. **Log in to Pulumi backend** (Pulumi Cloud or local)
 
@@ -86,9 +132,6 @@ Pulumi ➜ Cloud Run (n8n container)
    | `cloudRunContainerPort` | number  | `5678`                | n8n container port                                |
    | `genericTimezone`       | string  | `UTC`                 | Default timezone for n8n                          |
    | `allowUnauthenticated`  | boolean | `true`                | If true, grants `roles/run.invoker` to `allUsers` |
-
-   Stack-scoped overrides: append `:<stack>` to any key, e.g.
-   `pulumi config set n8n-self-host-on-gcp:staging:cloudRunMaxInstances 3`.
 
 5. **Preview and apply**
 
