@@ -1,5 +1,11 @@
 {
   "name": "n8n-self-host-on-gcp-pulumi",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "engines": {
+    "node": "22.11.0"
+  },
   "scripts": {
     "test": "jest --coverage",
     "test:ci": "jest --coverage --ci",
