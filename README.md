@@ -71,6 +71,11 @@ flowchart TD
    ├─ config.ts                # Aggregates Pulumi stack config into DeploymentConfig
    ├─ index.ts                 # Entry point orchestrating component creation
    ├─ components/
+   │  ├─ __tests__/            # Jest unit tests exercising component factories
+   │  │  ├─ cloudRunService.test.ts
+   │  │  ├─ database.test.ts
+   │  │  ├─ secrets.test.ts
+   │  │  └─ serviceAccount.test.ts
    │  ├─ CloudRunService.ts    # Cloud Run deployment + IAM binding
    │  ├─ Database.ts           # Cloud SQL instance, database, user, password
    │  ├─ ProjectServices.ts    # Enables required GCP APIs
@@ -86,6 +91,12 @@ flowchart TD
 Generated directories such as `node_modules/` are omitted for brevity.
 
 ````
+
+## Running Tests
+
+- `pnpm test`
+
+The Jest suite uses Pulumi runtime mocks to validate each component in isolation. Because the mocks short-circuit calls to GCP, the tests execute quickly, cost nothing, and run safely in CI or on developer machines without needing cloud credentials. They assert on the exact resource inputs Pulumi will send to Google—catching mistakes in IAM bindings, secret wiring, or service configuration long before you reach `pulumi preview` or `pulumi up`. Keeping the specs alongside the components in `src/components/__tests__` mirrors the implementation layout, making it easy to add coverage as you evolve the infrastructure.
 
 ## Pulumi Deployment Steps
 
