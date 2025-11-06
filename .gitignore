@@ -1,2 +1,25 @@
+# Node.js modules
+node_modules/
 /bin/
-/node_modules/
+
+# TypeScript build output
+dist/
+*.js
+*.js.map
+
+# Pulumi specific files
+.pulumi/
+Pulumi.*.yaml # Stack-specific configuration files
+Pulumi.yaml.bak # Backup files
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Operating System generated files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+tmp/
