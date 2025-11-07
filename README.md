@@ -1,3 +1,5 @@
+<img width="400" height="400" alt="n8n-self-hosted-pulumi-gcp" src="https://github.com/user-attachments/assets/214d1f2f-b54e-492d-8e10-0aa5955552fa" />
+
 # Self-Hosting n8n on Google Cloud Run: Complete Guide
 
 So you want to run n8n without the monthly subscription fees, keep your data under your own control, and avoid the headache of server maintenance? Google Cloud Run offers exactly that sweet spot: fully managed, serverless containers with per-use pricing. This repo gives you a production-ready, modular Pulumi program that stands up the official n8n container on Cloud Run, backed by Cloud SQL Postgres, wrapped with Google Secret Manager, and ready for secure automation at scale.
@@ -8,6 +10,16 @@ So you want to run n8n without the monthly subscription fees, keep your data und
 - **Data sovereignty** – Your workflows, credentials, and execution history stay inside your GCP footprint, satisfying security or compliance requirements.
 - **Native Google integrations** – Built-in OAuth consent, low-latency access to GCP services, and the ability to use Workload Identity with the deployed service account.
 - **Infrastructure as Code** – Pulumi keeps a full inventory of the deployed resources so you can version, review, and promote changes across environments.
+
+## Costs
+
+GCP Infrastructure costs are approximately ~$25 USD / month for a starter setup. 
+For a simple starter setup (config that's in the repo) these are the approximate costs.
+
+Depends on your usage and how big of a DB you need - but it's super cheap and as you scale this will be 8x cheaper than using n8n managed instance. 
+
+<img width="300" height="500" alt="image" src="https://github.com/user-attachments/assets/b998fe24-911a-408e-9b8c-f27b9391f821" />
+
 
 ## Component-Driven Pulumi Structure
 
